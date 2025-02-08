@@ -38,7 +38,8 @@ export function VideoUpload() {
       | FormData
       | NodeJS.ReadableStream
       | ReadableStream<Uint8Array<ArrayBufferLike>>
-      | URLSearchParams
+      | URLSearchParams,
+    category: string
   ) {
     try {
       setIsUploading(true);
@@ -73,7 +74,7 @@ export function VideoUpload() {
       const { error: dbError } = await supabase.from("videos").insert([
         {
           video_name: generatedFileName,
-          category: "travel",
+          category: category,
         },
       ]);
 
