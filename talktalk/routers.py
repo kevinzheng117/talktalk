@@ -1,11 +1,9 @@
-# ./routers.py
-
 from rest_framework import routers
 
 from talktalk.viewsets import VideoViewSet
 
 router = routers.SimpleRouter()
 
-router.register(r'menu', VideoViewSet, basename="menu")
+router.register(r'video', VideoViewSet, basename="video")
 
 urlpatterns = router.urls

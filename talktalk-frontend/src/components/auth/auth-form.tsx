@@ -67,7 +67,6 @@ export function AuthForm({ type }: AuthFormProps) {
 
   function onSubmit(values: z.infer<typeof schema>) {
     console.log(values);
-    // Handle form submission
   }
 
   return (
@@ -160,7 +159,8 @@ export function AuthForm({ type }: AuthFormProps) {
             </div>
             <Button variant="outline" className="w-full" type="button">
               <Github className="mr-2 h-4 w-4" />
-              Github
+              <Link href="#">Github</Link>
+              
             </Button>
           </CardContent>
           <CardFooter className="flex flex-wrap items-center justify-between gap-2">
