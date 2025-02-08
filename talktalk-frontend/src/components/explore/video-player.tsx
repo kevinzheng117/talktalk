@@ -57,7 +57,6 @@ export function VideoPlayer({
             isActive ? "opacity-100" : "opacity-0"
           )}
           loop
-          muted
           playsInline
           onLoadedData={handleLoadedData}
           onError={handleError}
