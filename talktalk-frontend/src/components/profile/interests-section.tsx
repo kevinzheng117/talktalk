@@ -33,7 +33,7 @@ export function InterestsSection() {
           Content Interests
         </CardTitle>
         <CardDescription>
-          Select up to 5 categories of content you&apos;re interested in
+          Select a category of content you&apos;re interested in
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -43,10 +43,7 @@ export function InterestsSection() {
             <FormItem>
               <Select
                 onValueChange={(value) => {
-                  const current = field.value || [];
-                  if (!current.includes(value) && current.length < 5) {
-                    field.onChange([...current, value]);
-                  }
+                  field.onChange(value);
                 }}
               >
                 <FormControl>
@@ -59,32 +56,27 @@ export function InterestsSection() {
                     <SelectItem
                       key={category.value}
                       value={category.value}
-                      disabled={field.value?.includes(category.value)}
+                      disabled={field.value === category.value}
                     >
                       {category.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <div className="flex flex-wrap gap-2 pt-2">
-                {field.value?.map((interest: Key | null | undefined) => (
-                  <Badge
-                    key={interest}
-                    variant="secondary"
-                    className="cursor-pointer"
-                    onClick={() => {
-                      field.onChange(
-                        field.value?.filter(
-                          (i: Key | null | undefined) => i !== interest
-                        )
-                      );
-                    }}
-                  >
-                    {contentCategories.find((c) => c.value === interest)?.label}
-                    <span className="ml-1">×</span>
-                  </Badge>
-                ))}
-              </div>
+              {/* <div className="flex flex-wrap gap-2 pt-2">
+                {field.value && (
+                    <Badge
+                      variant="darkPurple"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        field.onChange(null);
+                      }}
+                    >
+                      {contentCategories.find((c) => c.value === field.value)?.label}
+                      <span className="ml-1">×</span>
+                    </Badge>
+                )}
+              </div> */}
               <FormMessage />
             </FormItem>
           )}
