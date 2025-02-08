@@ -1,3 +1,3 @@
 social-auth-app-django
 requests
-python-decouple
+decouple
