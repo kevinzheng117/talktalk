@@ -35,7 +35,7 @@ export default function Navbar() {
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
             asChild
           >
-            <Link href="/signup">Join Free</Link>
+            <Link href="">Join Free</Link>
           </Button>
         </div>
       </div>

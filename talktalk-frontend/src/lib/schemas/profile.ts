@@ -1,4 +1,4 @@
-import * as z from "zod"
+import * as z from "zod";
 
 export const profileFormSchema = z.object({
   displayName: z
@@ -25,7 +25,6 @@ export const profileFormSchema = z.object({
     .max(5, {
       message: "You can select up to 5 interests.",
     }),
-})
+});
 
-export type ProfileFormData = z.infer<typeof profileFormSchema>
-
+export type ProfileFormData = z.infer<typeof profileFormSchema>;
