@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 "use client";
-=======
-"use client"
->>>>>>> 28bdacc3c48143916067aa8270c23a6342bc63d8
 
 import { useSession } from "next-auth/react";
 
