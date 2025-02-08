@@ -15,8 +15,7 @@ open_ended = "and 2 <10 word sample answers.\n"
                  if open ended, will generate 2 sample answers
     @param transcript: the transcript of the video
     @param skill_level: the skill level of the user (beginner, intermediate, advanced)
-    @param output_path: the path to the output file
-    @return: a json file with the questions, options, and answer
+    @return: a json object with the questions, options, and answer
 """
 def makeComprehension(mode, transcript, skill_level, output_path):
   question_request = """Please on one line generate json with 3
@@ -36,9 +35,8 @@ def makeComprehension(mode, transcript, skill_level, output_path):
           'response_mime_type': 'application/json',
       },
   )
-  print(response.text)
-  # with open(output_path, "w") as file:
-  #   json.dump(json.loads(response.text), file, indent=4)
+  # print(response.text)
+  return json.loads(response.text)
 
 """ Tailor the questions based on skill level """
 def getDifficulty(skill_level):

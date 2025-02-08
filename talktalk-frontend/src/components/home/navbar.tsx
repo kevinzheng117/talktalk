@@ -28,14 +28,18 @@ export default function Navbar() {
         </nav>
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Sign In</Link>
+            <Link href="http://127.0.0.1:8000/auth/login/google-oauth2/">
+              Sign In
+            </Link>
           </Button>
           <Button
             size="sm"
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
             asChild
           >
-            <Link href="">Join Free</Link>
+            <Link href="http://127.0.0.1:8000/auth/login/google-oauth2/">
+              Join Free
+            </Link>
           </Button>
         </div>
       </div>
