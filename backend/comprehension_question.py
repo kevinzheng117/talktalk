@@ -36,9 +36,9 @@ def makeComprehension(mode, transcript, skill_level, output_path):
           'response_mime_type': 'application/json',
       },
   )
-  # print(response.text)
-  with open(output_path, "w") as file:
-    json.dump(json.loads(response.text), file, indent=4)
+  print(response.text)
+  # with open(output_path, "w") as file:
+  #   json.dump(json.loads(response.text), file, indent=4)
 
 """ Tailor the questions based on skill level """
 def getDifficulty(skill_level):
@@ -52,8 +52,8 @@ def getDifficulty(skill_level):
     return """Make the questions primarily focused around motivations for the
               video and what smaller details occured in the video\n"""
 
-"""Sample way of calling the function"""
+# """Sample way of calling the function"""
 # test_transcript = """hi everyone today here's a what's in my bag video. some top
 #                      essentials i have with myself at all times include my
 #                      phone, laptop, and ipad. see you all next time!"""
-# makeComprehension("multiple_choice", test_transcript, "beginner", "output.json")
+# makeComprehension("open_ended", test_transcript, "advanced", "output.json")
