@@ -15,7 +15,6 @@ import useUser from "@/hooks/useUser";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfilePage() {
-
   const { user, isLoading, error } = useUser();
 
   const form = useForm<ProfileFormData>({
@@ -23,7 +22,7 @@ export default function ProfilePage() {
     defaultValues: {
       displayName: "",
       bio: "",
-      targetLanguages: [],
+      targetLanguage: "",
       proficiencyLevels: {},
       learningIntensity: 3,
       interests: "",
@@ -33,21 +32,27 @@ export default function ProfilePage() {
   async function onSubmit(values: ProfileFormData) {
     if (!user) return;
 
-    const { error } = await supabase
-    .from('user_info')
-    .upsert([
-      {
-        // uuid will generate randomly
-        name: values.displayName,
-        email: user.email, // from oauth
-        proficiency: values.proficiencyLevels,
-        intensity: values.learningIntensity,
-        content_interest: values.interests,
-      },
-    ], { onConflict: ['email'] }); // Use 'email' as the unique key to determine conflicts
+    const { error } = await supabase.from("user_info").upsert(
+      [
+        {
+          // uuid will generate randomly
+          name: values.displayName,
+          email: user.email, // from oauth
+          proficiency: values.proficiencyLevels,
+          intensity: values.learningIntensity,
+          content_interest: values.interests,
+        },
+      ],
+      { onConflict: "email" }
+    ); // Use 'email' as the unique key to determine conflicts
 
     if (error) {
-      console.error("Error saving profile:", error, error.message, error.details);
+      console.error(
+        "Error saving profile:",
+        error,
+        error.message,
+        error.details
+      );
     } else {
       console.log("Profile saved successfully!");
     }
