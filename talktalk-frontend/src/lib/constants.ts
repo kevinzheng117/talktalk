@@ -1,3 +1,5 @@
+import { QuizQuestion } from "@/types/quiz-data";
+
 export const languagesToLearn = [
   { label: "Spanish", value: "es" },
   { label: "French", value: "fr" },
@@ -51,5 +53,33 @@ export const MOCK_VIDEOS = [
     caption: "Fun times! 🎉 #fun",
     likes: 9012,
     username: "@funtime",
+  },
+];
+
+export const quizData: QuizQuestion[] = [
+  {
+    question: "What type of video is this?",
+    answers: [
+      "Makeup tutorial",
+      "What's in my bag",
+      "Cooking show",
+      "Travel vlog",
+    ],
+    correct_answer: "What's in my bag",
+  },
+  {
+    question: "Which device was mentioned as a top essential?",
+    answers: ["Television", "Phone", "Gaming console", "Smart watch"],
+    correct_answer: "Phone",
+  },
+  {
+    question: "Besides a phone, what other devices were mentioned?",
+    answers: [
+      "Tablet and E-reader",
+      "Laptop and iPad",
+      "Camera and microphone",
+      "Headphones and speakers",
+    ],
+    correct_answer: "Laptop and iPad",
   },
 ];
