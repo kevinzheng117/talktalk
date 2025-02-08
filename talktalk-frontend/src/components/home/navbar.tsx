@@ -1,6 +1,7 @@
 // app/components/navbar.tsx
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { signIn } from "@/auth";
 
 // Update the navbar content
 export default function Navbar() {
@@ -27,20 +28,23 @@ export default function Navbar() {
           </Link>
         </nav>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="http://127.0.0.1:8000/auth/login/google-oauth2/">
-              Sign In
-            </Link>
-          </Button>
-          <Button
-            size="sm"
-            className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
-            asChild
+          <form
+            action={async () => {
+              "use server";
+              await signIn("google");
+            }}
           >
-            <Link href="http://127.0.0.1:8000/auth/login/google-oauth2/">
+            <Button type="submit" variant="ghost" size="sm">
+              Sign In
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+            >
               Join Free
-            </Link>
-          </Button>
+            </Button>
+          </form>
         </div>
       </div>
     </header>
