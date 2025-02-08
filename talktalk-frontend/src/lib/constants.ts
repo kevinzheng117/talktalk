@@ -11,12 +11,9 @@ export const languagesToLearn = [
 ] as const;
 
 export const proficiencyLevels = [
-  { label: "Beginner (A1)", value: "a1" },
-  { label: "Elementary (A2)", value: "a2" },
-  { label: "Intermediate (B1)", value: "b1" },
-  { label: "Upper Intermediate (B2)", value: "b2" },
-  { label: "Advanced (C1)", value: "c1" },
-  { label: "Mastery (C2)", value: "c2" },
+  { label: "Beginner", value: "1" },
+  { label: "Intermediate", value: "2" },
+  { label: "Advanced", value: "3" },
 ] as const;
 
 export const contentCategories = [

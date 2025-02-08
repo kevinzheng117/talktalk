@@ -38,7 +38,7 @@ export function LanguagesSection() {
           Languages to Learn
         </CardTitle>
         <CardDescription>
-          Select the languages you want to learn
+          Select the language you want to learn
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -71,7 +71,7 @@ export function LanguagesSection() {
                   ))}
                 </SelectContent>
               </Select>
-              <div className="flex flex-wrap gap-2 pt-2">
+              {/* <div className="flex flex-wrap gap-2 pt-2">
                 {targetLanguages?.map((lang: Key | null | undefined) => (
                   <Badge
                     key={lang}
@@ -89,7 +89,7 @@ export function LanguagesSection() {
                     <span className="ml-1">×</span>
                   </Badge>
                 ))}
-              </div>
+              </div> */}
               <FormMessage />
             </FormItem>
           )}
