@@ -10,6 +10,8 @@ import { LanguagesSection } from "@/components/profile/languages-section";
 import { IntensitySection } from "@/components/profile/intensity-section";
 import { InterestsSection } from "@/components/profile/interests-section";
 import { type ProfileFormData, profileFormSchema } from "@/lib/schemas/profile";
+import useUser from "@/hooks/useUser";
+
 
 export default function ProfilePage() {
   const form = useForm<ProfileFormData>({
@@ -23,6 +25,8 @@ export default function ProfilePage() {
       interests: [],
     },
   });
+
+
 
   function onSubmit(values: ProfileFormData) {
     console.log(values);

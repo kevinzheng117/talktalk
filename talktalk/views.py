@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -9,7 +10,7 @@ from .forms import VideoForm
 from django.contrib.auth.decorators import login_required
 
 
-# @login_required
+@login_required
 def video_upload(request):
     if request.method == 'POST':
         form = VideoForm(request.POST, request.FILES)
@@ -28,5 +29,17 @@ def video_upload(request):
         return render(request, 'sample-frontend/upload.html', {'form': form})
 
 
+@login_required
 def video_success(request):
     return HttpResponse("Video uploaded successfully!")
+
+
+@login_required
+def user_profile(request):
+    user = request.user
+    print(user)
+    return JsonResponse({
+        "id": user.id,
+        "name": user.get_full_name() or user.username,
+        "email": user.email,
+    })
