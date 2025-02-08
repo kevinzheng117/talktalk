@@ -1,31 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react';
-import { UploadForm } from "./upload-form"
-import { UploadStatus } from "./upload-status"
-import { VideoDetails } from "./video-details"
-import { Container, Form, Row, Col, Card } from 'react-bootstrap';
-import { createClient } from '@supabase/supabase-js';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect } from "react";
+import { UploadForm } from "./upload-form";
+import { UploadStatus } from "./upload-status";
+import { VideoDetails } from "./video-details";
+import { Container, Form, Row, Col, Card } from "react-bootstrap";
+import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
-const supabase = createClient("https://lhayczdxenefkmxgdgif.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs");
+const supabase = createClient(
+  "https://lhayczdxenefkmxgdgif.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs"
+);
 
-const CDNURL = "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
-
+const CDNURL =
+  "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
 
 export function VideoUpload() {
-
-  const [ videos, setVideos ] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   async function getVideos() {
-    const { data, error } = await supabase
-      .storage
-      .from('videos') // videos/
-      .list('')
+    const { data, error } = await supabase.storage
+      .from("videos") // videos/
+      .list("");
     // data: [video1, video2, video3]
     // video1: "coopercodesvideo.mp4" CDNLINK.com/coopercodesvideo.mp4
 
-    if(data !== null) {
+    if (data !== null) {
       setVideos(data);
     } else {
       console.log(error);
@@ -44,28 +45,32 @@ export function VideoUpload() {
     console.log("Upload!");
 
     const { error } = await supabase.storage
-      .from('videos')
-      .upload(uuidv4() + ".mp4", videoFile) // uuidv4() => ASDFASDFASDASFASDF.mp4
+      .from("videos")
+      .upload(uuidv4() + ".mp4", videoFile); // uuidv4() => ASDFASDFASDASFASDF.mp4
 
-    if(error) {
+    if (error) {
       console.log(error);
       alert("Error uploading file to Supabase");
     }
   }
 
   return (
-    <Container className='mt-5' style={{width: "700px"}}>
+    <Container className="mt-5" style={{ width: "700px" }}>
       <h1>VideoFeed</h1>
       <Form.Group className="mb-3 mt-3">
         <Form.Label>Upload your video here!</Form.Label>
-        <Form.Control type="file" accept="video/mp4" onChange={(e) => uploadFile(e)}/>
+        <Form.Control
+          type="file"
+          accept="video/mp4"
+          onChange={(e) => uploadFile(e)}
+        />
       </Form.Group>
 
       <Row xs={1} className="g-4">
         {videos.map((video) => {
           console.log(video);
           if (video.name === ".emptyFolderPlaceholder") return null;
-          
+
           return (
             <Col>
               <Card>
@@ -74,52 +79,52 @@ export function VideoUpload() {
                 </video>
               </Card>
             </Col>
-          )
+          );
         })}
       </Row>
     </Container>
   );
 }
 
-  // const [isUploading, setIsUploading] = useState(false)
-  // const [progress, setProgress] = useState(0)
-  // const [showDetails, setShowDetails] = useState(false)
+// const [isUploading, setIsUploading] = useState(false)
+// const [progress, setProgress] = useState(0)
+// const [showDetails, setShowDetails] = useState(false)
 
-  // // Simulated upload handler - replace with your implementation
-  // const handleUpload = () => {
-  //   setIsUploading(true)
-  //   setProgress(0)
+// // Simulated upload handler - replace with your implementation
+// const handleUpload = () => {
+//   setIsUploading(true)
+//   setProgress(0)
 
-  //   // Simulate progress
-  //   const interval = setInterval(() => {
-  //     setProgress((prev) => {
-  //       if (prev >= 100) {
-  //         clearInterval(interval)
-  //         setIsUploading(false)
-  //         setShowDetails(true)
-  //         return 100
-  //       }
-  //       return prev + 10
-  //     })
-  //   }, 500)
-  // }
+//   // Simulate progress
+//   const interval = setInterval(() => {
+//     setProgress((prev) => {
+//       if (prev >= 100) {
+//         clearInterval(interval)
+//         setIsUploading(false)
+//         setShowDetails(true)
+//         return 100
+//       }
+//       return prev + 10
+//     })
+//   }, 500)
+// }
 
-  // return (
-  //   <div className="mt-8 grid gap-6 lg:grid-cols-2">
-  //     <Card className="p-6">
-  //       <div className="space-y-6">
-  //         <UploadForm onUpload={handleUpload} disabled={isUploading} />
-  //         {isUploading && <UploadStatus progress={progress} />}
-  //       </div>
-  //     </Card>
-  //     <Card className="p-6">
-  //       {showDetails ? (
-  //         <VideoDetails />
-  //       ) : (
-  //         <div className="h-full flex items-center justify-center text-muted-foreground">
-  //           <p>Video details will appear here after upload</p>
-  //         </div>
-  //       )}
-  //     </Card>
-  //   </div>
-  // )
+// return (
+//   <div className="mt-8 grid gap-6 lg:grid-cols-2">
+//     <Card className="p-6">
+//       <div className="space-y-6">
+//         <UploadForm onUpload={handleUpload} disabled={isUploading} />
+//         {isUploading && <UploadStatus progress={progress} />}
+//       </div>
+//     </Card>
+//     <Card className="p-6">
+//       {showDetails ? (
+//         <VideoDetails />
+//       ) : (
+//         <div className="h-full flex items-center justify-center text-muted-foreground">
+//           <p>Video details will appear here after upload</p>
+//         </div>
+//       )}
+//     </Card>
+//   </div>
+// )
