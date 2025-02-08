@@ -224,7 +224,9 @@ export function VideoFeed() {
           </div>
         );
       }
+      
       if (slide.type === "quiz") {
+        const q_idx = i >= 1 ? i - 1 : 0;
         return (
           <div
             key={`quiz-${i}`}
@@ -232,7 +234,7 @@ export function VideoFeed() {
             className="quiz-container relative h-full w-full snap-start snap-always"
           >
             <div className="flex h-full items-center justify-center px-4">
-              <TikTokQuiz questions={quizData} />
+              <TikTokQuiz questions={quizData[q_idx]} />
             </div>
           </div>
         );
