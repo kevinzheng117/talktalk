@@ -227,6 +227,7 @@ export function VideoFeed() {
       
       if (slide.type === "quiz") {
         const q_idx = i >= 1 ? i - 1 : 0;
+        console.log("about to pass", quizData[q_idx], "at idx", q_idx)
         return (
           <div
             key={`quiz-${i}`}
@@ -247,7 +248,7 @@ export function VideoFeed() {
           className="speech-container relative h-full w-full snap-start snap-always"
         >
           <div className="flex h-full items-center justify-center px-4">
-            <SpeechToText referenceText={"Como Estas"} />
+            <SpeechToText referenceText={"Europa por treinta y nueve mil."} />
           </div>
         </div>
       );
