@@ -1,12 +1,16 @@
 // Import required libraries
-const fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
+// const fetch = require('node-fetch');
+import fetch from 'node-fetch'
+// const fs = require('fs');
+import fs from 'fs';
+// const path = require('path');
+import path from 'path';
+// const dotenv = require('dotenv');
+import dotenv from 'dotenv'
 const { SpeechConfig, AudioConfig, SpeechRecognizer, PronunciationAssessmentConfig, PropertyId, ResultReason } = require('microsoft-cognitiveservices-speech-sdk');
 
 // Load environment variables
-dotenv.config({ path: path.join(__dirname, '../.', 'local.env') });
+// dotenv.config({ path: path.join(__dirname, '../.', 'local.env') });
 
 const speechKey = process.env.SPEECH_KEY;
 const serviceRegion = "eastus";
@@ -14,7 +18,7 @@ console.log("KEY", speechKey)
 
 // File paths for audio
 const welcomeFileName = "../sample_audio/sample_welcome.wav";
-const seasonsFileName = "../sample_audio/vocab_fall_sample.wav";
+const seasonsFileName = "../talktalk-frontend/public/sample_audio/vocab_fall_sample.wav";
 
 // Pronunciation Assessment Functions
 async function getPronunciationQuestion(transcript, skillLevel) {
@@ -89,7 +93,7 @@ function parseResultsForFeedback(nbest) {
 }
 
 // Content and Pronunciation Assessment
-async function contentAndPronunciationAssessment(audioFile, transcript, question) {
+export async function contentAndPronunciationAssessment(audioFile, transcript, question) {
     const speechConfig = SpeechConfig.fromSubscription(speechKey, serviceRegion);
     const audioConfig = AudioConfig.fromWavFileInput(fs.readFileSync(audioFile));
   
@@ -124,7 +128,8 @@ async function contentAndPronunciationAssessment(audioFile, transcript, question
 
                 // return feedback;
             } else {
-                reject("No speech could be recognized or cancellation occurred.");
+                const cancellation_details = fromResult(result)
+                reject(`No speech could be recognized or cancellation occurred, reason ${result.reason}, details ${cancellation_details}`);
             }
         });
     });
@@ -162,14 +167,14 @@ async function assessOnTopicness(transcript, question, answer) {
 }
 
 // Example usage
-res = contentAndPronunciationAssessment(seasonsFileName, `
-Fall is a special and unique season. It marks the beginning of shortened
-days and sunshiney but chilly weather.
-It comes in a burst of color but ushers in the dark, coldness of winter.`, "Describe what fall means to you.");
+// res = contentAndPronunciationAssessment(seasonsFileName, `
+// Fall is a special and unique season. It marks the beginning of shortened
+// days and sunshiney but chilly weather.
+// It comes in a burst of color but ushers in the dark, coldness of winter.`, "Describe what fall means to you.");
 
-res.then(x => {
-    console.log("Resolved!");
-    console.log(x)
-}).catch((err) => {
-    console.log(err);
-})
+// res.then(x => {
+//     console.log("Resolved!");
+//     console.log(x)
+// }).catch((err) => {
+//     console.log(err);
+// })
