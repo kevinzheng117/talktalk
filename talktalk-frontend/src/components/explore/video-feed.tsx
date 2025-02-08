@@ -33,13 +33,51 @@ export function VideoFeed() {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   async function getVideos() {
-    const { data, error } = await supabase.storage.from("videos").list("");
-    if (data !== null) {
-      setVideos(data);
-    } else {
-      console.log(error);
-      alert("Error grabbing files from Supabase");
+    // Select all fields to see what we're getting
+    const { data: dbVideos, error: dbError } = await supabase
+      .from("videos")
+      .select("*");
+
+    if (dbError) {
+      console.error("Database error:", dbError);
+      alert("Error fetching videos from database");
+      return;
     }
+
+    // Log the complete database records
+    console.log("Complete database records:", dbVideos);
+
+    // Filter out any entries with empty video names
+    const validVideoNames = dbVideos
+      .filter((video) => video.video_name && video.video_name.trim() !== "")
+      .map((video) => video.video_name);
+
+    console.log("Valid video names after filtering:", validVideoNames);
+
+    const { data: storageFiles, error: storageError } = await supabase.storage
+      .from("videos")
+      .list("");
+
+    if (storageError) {
+      console.error("Storage error:", storageError);
+      alert("Error grabbing files from storage");
+      return;
+    }
+
+    // Add detailed comparison logging
+    storageFiles.forEach((file) => {
+      console.log(`Checking file: ${file.name}`);
+      console.log(
+        `Database has this name?: ${validVideoNames.includes(file.name)}`
+      );
+    });
+
+    const filteredVideos = storageFiles.filter((file) =>
+      validVideoNames.includes(file.name)
+    );
+
+    console.log("Final filtered videos:", filteredVideos);
+    setVideos(filteredVideos);
   }
 
   useEffect(() => {
