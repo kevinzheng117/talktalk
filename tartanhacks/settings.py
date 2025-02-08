@@ -135,10 +135,15 @@ WSGI_APPLICATION = 'tartanhacks.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # dbname
+        'USER': 'postgres.lhayczdxenefkmxgdgif',  # user
+        'PASSWORD': 'DD120426?',  # replace [YOUR-PASSWORD] with your actual password
+        'HOST': 'aws-0-us-east-2.pooler.supabase.com',  # host
+        'PORT': '5432',  # port
     }
 }
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
