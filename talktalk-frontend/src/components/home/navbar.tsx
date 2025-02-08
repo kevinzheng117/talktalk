@@ -27,14 +27,15 @@ export default function Navbar() {
           </Link>
         </nav>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm">
-            Sign In
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/login">Sign In</Link>
           </Button>
           <Button
             size="sm"
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+            asChild
           >
-            Join Free
+            <Link href="/signup">Join Free</Link>
           </Button>
         </div>
       </div>
