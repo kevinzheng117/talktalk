@@ -1,4 +1,4 @@
-import { VideoFeed } from "@/components/video-feed";
+import { VideoFeed } from "@/components/explore/video-feed";
 
 export default function Explore() {
   return (
