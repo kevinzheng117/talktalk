@@ -80,3 +80,6 @@ export const quizData: QuizQuestion[] = [
     correct_answer: "Laptop and iPad",
   },
 ];
+
+export const CDNURL =
+  "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";

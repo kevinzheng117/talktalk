@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import type { VideoPlayerProps } from "@/types/video";
-import { VideoOverlay } from "./video-overlay";
+import { CDNURL } from "@/lib/constants";
 
 export function VideoPlayer({
   video,
@@ -35,7 +35,7 @@ export function VideoPlayer({
   }, [isFirstLoad]);
 
   return (
-    <div className="relative aspect-[9/16] w-full max-w-[350px] overflow-hidden rounded-xl bg-muted">
+    <div className="relative aspect-[9/16] w-full max-w-[400px] overflow-hidden rounded-xl bg-muted">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -49,27 +49,21 @@ export function VideoPlayer({
       ) : (
         <video
           ref={videoRef}
-          src={video.url}
           className={cn(
             "h-full w-full object-cover",
             isActive ? "opacity-100" : "opacity-0"
           )}
           loop
-          muted
           playsInline
           onLoadedData={handleLoadedData}
           onError={handleError}
           // Add onPlay and onPause handlers to manage loading state
           onPlay={() => setIsLoading(false)}
           onPause={() => setIsLoading(false)}
-        />
+        >
+          <source src={CDNURL + video.name} type="video/mp4" />
+        </video>
       )}
-
-      <VideoOverlay
-        username={video.username}
-        caption={video.caption}
-        likes={video.likes}
-      />
     </div>
   );
 }

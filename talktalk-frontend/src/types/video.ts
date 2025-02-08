@@ -1,13 +1,7 @@
-export interface Video {
-  id: string;
-  url: string;
-  caption: string;
-  likes: number;
-  username: string;
-}
+import { FileObject } from "@supabase/storage-js";
 
 export interface VideoPlayerProps {
-  video: Video;
+  video: FileObject;
   isActive: boolean;
   onLoadedData: () => void;
   videoRef: (el: HTMLVideoElement | null) => void;

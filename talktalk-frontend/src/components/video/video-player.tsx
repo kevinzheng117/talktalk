@@ -1,5 +1,5 @@
 interface VideoPlayerProps {
-  url: string
+  url: string;
 }
 
 export function VideoPlayer({ url }: VideoPlayerProps) {
@@ -11,6 +11,5 @@ export function VideoPlayer({ url }: VideoPlayerProps) {
         Your browser does not support the video tag.
       </video>
     </div>
-  )
+  );
 }
-

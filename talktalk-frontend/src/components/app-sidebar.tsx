@@ -1,4 +1,9 @@
-import { Telescope, UserRoundPen, Loader, TrendingUp } from "lucide-react";
+import {
+  Telescope,
+  UserRoundIcon as UserRoundPen,
+  Loader,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -30,6 +35,7 @@ const items = [
     title: "Progress",
     url: "/progress",
     icon: TrendingUp,
+    description: "Track your journey",
   },
   {
     title: "Upload",
@@ -44,25 +50,27 @@ export function AppSidebar() {
     <Sidebar className="border-r border-purple-800/20">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 py-2">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <SidebarGroupLabel className="px-6 pt-6 pb-4">
+            <Link href="/" className="flex items-center">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 TalkTalk
               </span>
             </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="px-3 pt-2">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="group relative flex items-center gap-3 rounded-lg px-3 py-2 text-zinc-200 transition-colors hover:bg-purple-500/10 hover:text-purple-400"
+                    className="group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-zinc-200 transition-colors hover:bg-purple-500/10 hover:text-purple-400"
                     tooltip={item.description}
                   >
                     <Link href={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5" />
-                      <span className="font-medium">{item.title}</span>
+                      <span className="text-[15px] font-medium">
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

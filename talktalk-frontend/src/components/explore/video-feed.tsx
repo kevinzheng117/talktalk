@@ -1,22 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { MOCK_VIDEOS } from "@/lib/constants";
-import type { Video } from "@/types/video";
-import { LoadingSpinner } from "./loading-spinner";
 import { NavigationControls } from "./navigation-controls";
 import { VideoPlayer } from "./video-player";
 import TikTokQuiz from "@/components/quiz/tiktok-quiz";
 import { quizData } from "@/lib/constants";
-
-import { Container, Form, Row, Col, Card } from 'react-bootstrap';
-import { createClient } from '@supabase/supabase-js';
-import { v4 as uuidv4 } from 'uuid';
-
-import { supabase } from "../../lib/supabaseClient";
-
-const CDNURL = "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
-
+import { useEffect, useMemo } from "react";
+import { createClient } from "@supabase/supabase-js";
+import type { FileObject } from "@supabase/storage-js";
+import { supabase } from "@/lib/supabaseClient";
 
 const hideScrollbarStyles = `
   .scrollbar-none::-webkit-scrollbar {
@@ -28,102 +20,121 @@ const hideScrollbarStyles = `
   }
 `;
 
+interface SlideData {
+  type: "video" | "quiz";
+  video?: FileObject;
+}
+
 export function VideoFeed() {
-  const [videos, setVideos] = React.useState<Video[]>(MOCK_VIDEOS);
+  const [videos, setVideos] = React.useState<FileObject[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
-  const [loading, setLoading] = React.useState(false);
-  const videoRefs = React.useRef<(HTMLVideoElement | null)[]>([]);
+  const [cycleCompleted, setCycleCompleted] = React.useState(false);
+  const videoRefs = React.useRef(new Map<string, HTMLVideoElement>());
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const loadMoreVideos = React.useCallback(async () => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setVideos((prev) => [...prev, ...MOCK_VIDEOS]);
-    setLoading(false);
+  async function getVideos() {
+    const { data, error } = await supabase.storage.from("videos").list("");
+    if (data !== null) {
+      setVideos(data);
+    } else {
+      console.log(error);
+      alert("Error grabbing files from Supabase");
+    }
+  }
+
+  useEffect(() => {
+    getVideos();
   }, []);
 
-  // Calculate if we should show quiz at current index
-  const shouldShowQuiz = (index: number) => (index + 1) % 4 === 0;
-  const isQuizSlide = (index: number) => shouldShowQuiz(index - 1);
+  // Compute slides data: for each video, push a video slide and, if applicable, a quiz slide.
+  const slidesData: SlideData[] = useMemo(() => {
+    const slides: SlideData[] = [];
+    videos.forEach((video, index) => {
+      slides.push({ type: "video", video });
+      // After every 4th video, add a quiz slide.
+      if ((index + 1) % 4 === 0) {
+        slides.push({ type: "quiz" });
+      }
+    });
+    return slides;
+  }, [videos]);
 
-  const lastVideoRef = React.useCallback(
-    (node: HTMLDivElement) => {
-      if (loading) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            loadMoreVideos();
-          }
-        },
-        { threshold: 0.5 }
-      );
-
-      if (node) observer.observe(node);
-    },
-    [loading, loadMoreVideos]
-  );
-
+  // For video slides, play the active video.
   const handleVideoInView = React.useCallback(
-    (index: number) => {
-      // Only handle video playback for non-quiz slides
-      if (!isQuizSlide(index)) {
-        videoRefs.current.forEach((video, i) => {
-          if (!video) return;
-
-          if (i === index) {
-            video.play().catch(() => {
-              console.log("Video playback failed");
-            });
-          } else {
-            video.pause();
-          }
+    (slideIndex: number) => {
+      // Only handle if the slide is a video.
+      if (
+        slidesData[slideIndex]?.type !== "video" ||
+        !slidesData[slideIndex].video
+      )
+        return;
+      // Pause all videos and reset time.
+      videoRefs.current.forEach((videoEl) => {
+        videoEl.pause();
+        videoEl.currentTime = 0;
+      });
+      const videoObj = slidesData[slideIndex].video!;
+      const currentVideoEl = videoRefs.current.get(videoObj.id);
+      if (currentVideoEl) {
+        currentVideoEl.play().catch(() => {
+          console.log("Video playback failed");
         });
       }
-      setCurrentIndex(index);
+      setCurrentIndex(slideIndex);
     },
-    [isQuizSlide]
-  ); // Added isQuizSlide to dependencies
+    [slidesData]
+  );
 
-  const getTotalSlides = () => {
-    const quizCount = Math.floor(videos.length / 3);
-    return videos.length + quizCount;
-  };
-
+  // Navigation now works with the total slide count.
   const handleNavigation = React.useCallback(
     (direction: "up" | "down") => {
-      const newIndex =
-        direction === "up"
-          ? Math.max(0, currentIndex - 1)
-          : Math.min(getTotalSlides() - 1, currentIndex + 1);
-
+      const totalSlides = slidesData.length;
+      if (direction === "down" && currentIndex === totalSlides - 1) {
+        setCycleCompleted(true);
+        return;
+      }
+      let newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (newIndex >= totalSlides) {
+        newIndex = 0;
+      } else if (newIndex < 0) {
+        newIndex = totalSlides - 1;
+      }
+      // Scroll container scrolls to the new slide.
       if (scrollContainerRef.current) {
         const containerHeight = scrollContainerRef.current.clientHeight;
         scrollContainerRef.current.scrollTo({
           top: containerHeight * newIndex,
           behavior: "smooth",
         });
+      }
+      // If the new slide is a video, try to trigger playback.
+      if (slidesData[newIndex].type === "video" && slidesData[newIndex].video) {
         handleVideoInView(newIndex);
+      } else {
+        // For quiz slides, just update the index.
+        setCurrentIndex(newIndex);
       }
     },
-    [currentIndex, handleVideoInView, videos]
+    [currentIndex, slidesData, handleVideoInView]
   );
 
-  // Get the actual video index accounting for quiz slides
-  const getVideoIndex = (slideIndex: number) => {
-    const quizzesBefore = Math.floor(slideIndex / 4);
-    return slideIndex - quizzesBefore;
-  };
-
-  React.useEffect(() => {
+  // Intersection observer: if a slide comes into view and it’s a video, update active slide.
+  useEffect(() => {
     if (!scrollContainerRef.current) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const index = Number(entry.target.getAttribute("data-index"));
           if (entry.isIntersecting && !isNaN(index)) {
-            handleVideoInView(index);
+            // Only trigger for video slides.
+            if (
+              slidesData[index]?.type === "video" &&
+              slidesData[index].video
+            ) {
+              handleVideoInView(index);
+            } else {
+              setCurrentIndex(index);
+            }
           }
         });
       },
@@ -132,85 +143,89 @@ export function VideoFeed() {
         threshold: 0.7,
       }
     );
-
     const elements = document.querySelectorAll(
       ".video-container, .quiz-container"
     );
     elements.forEach((el) => observer.observe(el));
-
     return () => observer.disconnect();
-  }, [handleVideoInView]);
+  }, [handleVideoInView, slidesData]);
 
-  // Generate slides (videos + quizzes)
+  // Render slides based on slidesData.
   const renderSlides = () => {
-    const slides: React.JSX.Element[] = [];
-    let slideIndex = 0;
-
-    videos.forEach((video, index) => {
-      // Add video slide
-      slides.push(
-        <div
-          key={`video-${video.id}-${index}`}
-          ref={index === videos.length - 1 ? lastVideoRef : undefined}
-          data-index={slideIndex}
-          className="video-container relative h-full w-full snap-start snap-always"
-        >
-          <div className="flex h-full flex-col items-center justify-center px-4">
-            <VideoPlayer
-              video={video}
-              isActive={slideIndex === currentIndex}
-              videoRef={(el) => (videoRefs.current[index] = el)}
-              onLoadedData={() => {
-                if (slideIndex === currentIndex) {
-                  handleVideoInView(slideIndex);
-                }
-              }}
-            />
-          </div>
-        </div>
-      );
-      slideIndex++;
-
-      // Add quiz slide after every 3 videos
-      if (shouldShowQuiz(index)) {
-        slides.push(
+    return slidesData.map((slide, i) => {
+      if (slide.type === "video" && slide.video) {
+        return (
           <div
-            key={`quiz-${index}`}
-            data-index={slideIndex}
-            className="quiz-container relative h-full w-full snap-start snap-always"
+            key={`video-${slide.video.id}-${i}`}
+            data-index={i}
+            className="video-container relative h-full w-full snap-start snap-always"
           >
-            <div className="flex h-full items-center justify-center px-4">
-              <TikTokQuiz questions={quizData} />
+            <div className="flex h-full flex-col items-center justify-center px-4">
+              <VideoPlayer
+                video={slide.video}
+                isActive={i === currentIndex}
+                videoRef={(el) => {
+                  if (el) {
+                    videoRefs.current.set(slide.video!.id, el);
+                  } else {
+                    videoRefs.current.delete(slide.video!.id);
+                  }
+                  // Autoplay first video if active.
+                  if (i === 0 && i === currentIndex && el) {
+                    el.play().catch(() => {
+                      console.log("Initial video playback failed");
+                    });
+                  }
+                }}
+                onLoadedData={() => {
+                  if (i === currentIndex) {
+                    handleVideoInView(i);
+                  }
+                }}
+              />
             </div>
           </div>
         );
-        slideIndex++;
       }
+      // Else, render quiz slide
+      return (
+        <div
+          key={`quiz-${i}`}
+          data-index={i}
+          className="quiz-container relative h-full w-full snap-start snap-always"
+        >
+          <div className="flex h-full items-center justify-center px-4">
+            <TikTokQuiz questions={quizData} />
+          </div>
+        </div>
+      );
     });
-
-    return slides;
   };
 
   return (
-
     <div className="relative h-[calc(100dvh-2rem)] w-full bg-black/95">
       <style>{hideScrollbarStyles}</style>
-
       <NavigationControls
         onNavigate={handleNavigation}
         canNavigateUp={currentIndex > 0}
-        canNavigateDown={currentIndex < getTotalSlides() - 1}
+        canNavigateDown={currentIndex < slidesData.length - 1}
       />
-
       <div
         ref={scrollContainerRef}
         className="mx-auto h-full w-full max-w-[500px] snap-y snap-mandatory overflow-y-scroll scrollbar-none"
       >
         {renderSlides()}
       </div>
-
-      {loading && <LoadingSpinner />}
-
+      {cycleCompleted && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-black/80 text-white px-8 py-6 rounded-xl backdrop-blur-sm text-center max-w-md mx-4">
+            <h2 className="text-xl font-semibold mb-2">All Videos Watched!</h2>
+            <p className="text-gray-300">
+              You've completed watching all available videos.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
