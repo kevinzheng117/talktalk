@@ -31,7 +31,7 @@ export default function Navbar() {
           <form
             action={async () => {
               "use server";
-              await signIn("google");
+              await signIn("google", { callbackUrl: "/dashboard" });
             }}
           >
             <Button type="submit" variant="ghost" size="sm">

@@ -24,7 +24,9 @@ export const contentCategories = [
   { label: "Music", value: "music" },
   { label: "News", value: "news" },
   { label: "Career", value: "career" },
-  { label: "School", value: "school" },
+  { label: "Education", value: "education" },
+  { label: "Lifestyle", value: "lifestyle" },
+  { label: "Fashion", value: "fashion" },
 ] as const;
 
 export const MOCK_VIDEOS = [
