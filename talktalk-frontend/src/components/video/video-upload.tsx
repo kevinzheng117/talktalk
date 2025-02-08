@@ -7,11 +7,7 @@ import { VideoDetails } from "./video-details";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { FileObject } from "@supabase/storage-js";
-
-const supabase = createClient(
-  "https://lhayczdxenefkmxgdgif.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs"
-);
+import { supabase } from "@/lib/supabaseClient";
 
 export function VideoUpload() {
   const [videos, setVideos] = useState<FileObject[]>([]);

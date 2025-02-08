@@ -4,10 +4,7 @@ import { Loader2 } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import type { VideoPlayerProps } from "@/types/video";
-import { VideoOverlay } from "./video-overlay";
-
-const CDNURL =
-  "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
+import { CDNURL } from "@/lib/constants";
 
 export function VideoPlayer({
   video,
@@ -67,12 +64,6 @@ export function VideoPlayer({
           <source src={CDNURL + video.name} type="video/mp4" />
         </video>
       )}
-
-      {/* <VideoOverlay
-        username={video.username}
-        caption={video.caption}
-        likes={video.likes}
-      /> */}
     </div>
   );
 }

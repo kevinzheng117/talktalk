@@ -8,14 +8,7 @@ import { quizData } from "@/lib/constants";
 import { useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { FileObject } from "@supabase/storage-js";
-
-const supabase = createClient(
-  "https://lhayczdxenefkmxgdgif.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs"
-);
-
-const CDNURL =
-  "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
+import { supabase } from "@/lib/supabaseClient";
 
 const hideScrollbarStyles = `
   .scrollbar-none::-webkit-scrollbar {
