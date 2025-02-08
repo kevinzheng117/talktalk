@@ -2,21 +2,19 @@ import { QuizQuestion } from "@/types/quiz-data";
 
 export const languagesToLearn = [
   { label: "Spanish", value: "es" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Italian", value: "it" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Mandarin Chinese", value: "zh" },
+  { label: "English", value: "eg" },
+  // { label: "French", value: "fr" },
+  // { label: "German", value: "de" },
+  // { label: "Italian", value: "it" },
+  // { label: "Japanese", value: "ja" },
+  // { label: "Korean", value: "ko" },
+  // { label: "Mandarin Chinese", value: "zh" },
 ] as const;
 
 export const proficiencyLevels = [
-  { label: "Beginner (A1)", value: "a1" },
-  { label: "Elementary (A2)", value: "a2" },
-  { label: "Intermediate (B1)", value: "b1" },
-  { label: "Upper Intermediate (B2)", value: "b2" },
-  { label: "Advanced (C1)", value: "c1" },
-  { label: "Mastery (C2)", value: "c2" },
+  { label: "Beginner", value: "1" },
+  { label: "Intermediate", value: "2" },
+  { label: "Advanced", value: "3" },
 ] as const;
 
 export const contentCategories = [

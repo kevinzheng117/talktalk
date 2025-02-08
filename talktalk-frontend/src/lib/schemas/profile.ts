@@ -12,19 +12,14 @@ export const profileFormSchema = z.object({
   bio: z.string().max(160, {
     message: "Bio must not be longer than 160 characters.",
   }),
-  targetLanguages: z.array(z.string()).min(1, {
-    message: "Please select at least one language to learn.",
+  targetLanguage: z.string().nonempty({
+    message: "Please select a language to learn.",
   }),
   proficiencyLevels: z.record(z.string()),
   learningIntensity: z.number().min(1).max(7),
-  interests: z
-    .array(z.string())
-    .min(1, {
-      message: "Please select at least one interest.",
-    })
-    .max(5, {
-      message: "You can select up to 5 interests.",
-    }),
+  interests: z.string().nonempty({
+    message: "Please select an interest.",
+  }),
 });
 
 export type ProfileFormData = z.infer<typeof profileFormSchema>;

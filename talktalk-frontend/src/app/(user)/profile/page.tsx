@@ -12,11 +12,12 @@ import { InterestsSection } from "@/components/profile/interests-section";
 import { type ProfileFormData, profileFormSchema } from "@/lib/schemas/profile";
 import useUser from "@/hooks/useUser";
 
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfilePage() {
 
   const { user, isLoading, error } = useUser();
-  
+
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -25,15 +26,31 @@ export default function ProfilePage() {
       targetLanguages: [],
       proficiencyLevels: {},
       learningIntensity: 3,
-      interests: [],
+      interests: "",
     },
   });
 
+  async function onSubmit(values: ProfileFormData) {
+    if (!user) return;
 
+    const { error } = await supabase
+    .from('user_info')
+    .upsert([
+      {
+        // uuid will generate randomly
+        name: values.displayName,
+        email: user.email, // from oauth
+        proficiency: values.proficiencyLevels,
+        intensity: values.learningIntensity,
+        content_interest: values.interests,
+      },
+    ], { onConflict: ['email'] }); // Use 'email' as the unique key to determine conflicts
 
-  function onSubmit(values: ProfileFormData) {
-    console.log(values);
-    // Handle form submission
+    if (error) {
+      console.error("Error saving profile:", error, error.message, error.details);
+    } else {
+      console.log("Profile saved successfully!");
+    }
   }
 
   return (
