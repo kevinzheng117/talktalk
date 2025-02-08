@@ -1,0 +1,8 @@
+<a href="{% url 'socialaccount_signup'%}">Login with Google</a>
+
+<h2>Upload a Video</h2>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}  <!-- Renders the form fields with labels and inputs -->
+  <button type="submit">Upload Video</button>
+</form>
