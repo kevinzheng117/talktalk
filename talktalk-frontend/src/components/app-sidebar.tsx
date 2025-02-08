@@ -1,5 +1,6 @@
-import { Telescope, UserRoundIcon as UserRoundPen, Loader } from "lucide-react";
+import { Telescope, UserRoundPen, Loader, TrendingUp } from "lucide-react";
 import Link from "next/link";
+
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +25,11 @@ const items = [
     url: "/profile",
     icon: UserRoundPen,
     description: "View your profile",
+  },
+  {
+    title: "Progress",
+    url: "/progress",
+    icon: TrendingUp,
   },
   {
     title: "Upload",
