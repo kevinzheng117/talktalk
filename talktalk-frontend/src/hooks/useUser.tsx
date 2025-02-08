@@ -1,33 +1,14 @@
-import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-// Define the User type
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+const useUser = () => {
+  const { data: session, status } = useSession();
 
-export default function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  // Return the user data, loading state, and any error
+  return {
+    user: session?.user,
+    isLoading: status === "loading",
+    error: session?.error || null,
+  };
+};
 
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/user/profile/", {
-      credentials: "include", // Include cookies for Django session-based auth
-      redirect: "manual",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching user:", err);
-        setLoading(false);
-      });
-  }, []);
-
-  return { user, loading };
-}
-
-
+export default useUser;

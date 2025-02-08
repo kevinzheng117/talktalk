@@ -14,6 +14,9 @@ import useUser from "@/hooks/useUser";
 
 
 export default function ProfilePage() {
+
+  const { user, isLoading, error } = useUser();
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -47,6 +50,9 @@ export default function ProfilePage() {
           <p className="text-muted-foreground">
             Customize your language learning journey
           </p>
+          {user?.email && (
+            <p className="text-muted-foreground">Email: {user.email}</p>
+          )}
         </div>
       </div>
 

@@ -9,10 +9,7 @@ import { useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { FileObject } from "@supabase/storage-js";
 
-const supabase = createClient(
-  "https://lhayczdxenefkmxgdgif.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs"
-);
+import { supabase } from "../../lib/supabaseClient";
 
 const CDNURL =
   "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
@@ -223,16 +220,8 @@ export function VideoFeed() {
       >
         {renderSlides()}
       </div>
-      {cycleCompleted && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-black/80 text-white px-8 py-6 rounded-xl backdrop-blur-sm text-center max-w-md mx-4">
-            <h2 className="text-xl font-semibold mb-2">All Videos Watched!</h2>
-            <p className="text-gray-300">
-              You've completed watching all available videos.
-            </p>
-          </div>
-        </div>
-      )}
+
+      {loading && <LoadingSpinner />}
     </div>
   );
 }
