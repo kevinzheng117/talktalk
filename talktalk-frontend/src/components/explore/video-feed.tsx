@@ -13,7 +13,7 @@ import { Container, Form, Row, Col, Card } from 'react-bootstrap';
 import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
-const supabase = createClient("https://lhayczdxenefkmxgdgif.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoYXljemR4ZW5lZmtteGdkZ2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5OTU1MjEsImV4cCI6MjA1NDU3MTUyMX0.NOUCLZyrn53x_NOzLzgYEIPWLso0fPZOy4w0GFgWQvs");
+import { supabase } from "../../lib/supabaseClient";
 
 const CDNURL = "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";
 
@@ -192,7 +192,7 @@ export function VideoFeed() {
   };
 
   return (
-    
+
     <div className="relative h-[calc(100dvh-2rem)] w-full bg-black/95">
       <style>{hideScrollbarStyles}</style>
 
@@ -210,7 +210,7 @@ export function VideoFeed() {
       </div>
 
       {loading && <LoadingSpinner />}
-      
+
     </div>
   );
 }
