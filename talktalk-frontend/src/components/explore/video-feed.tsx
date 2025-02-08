@@ -34,74 +34,57 @@ export function VideoFeed() {
   const videoRefs = React.useRef(new Map<string, HTMLVideoElement>());
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-  async function getVideos() {
+  const getVideos = React.useCallback(async () => {
     if (!user?.email) {
-      console.error("No user email found");
+      console.log("User not logged in yet");
       return;
     }
 
-    // First, get the user's content interest
-    const { data: userInfo, error: userError } = await supabase
-      .from("user_info")
-      .select("content_interest")
-      .eq("email", user.email)
-      .single();
+    try {
+      // First, get the user's content interest
+      const { data: userInfo, error: userError } = await supabase
+        .from("user_info")
+        .select("content_interest")
+        .eq("email", user.email)
+        .single();
 
-    if (userError) {
-      console.error("Error fetching user info:", userError);
-      return;
+      if (userError) throw new Error(`User info error: ${userError.message}`);
+      if (!userInfo?.content_interest)
+        throw new Error("No content interest found");
+
+      // Then, get videos matching the user's content interest
+      const { data: dbVideos, error: dbError } = await supabase
+        .from("videos")
+        .select("*")
+        .eq("category", userInfo.content_interest);
+
+      if (dbError) throw new Error(`Database error: ${dbError.message}`);
+
+      const validVideoNames = dbVideos
+        .filter((video) => video.video_name && video.video_name.trim() !== "")
+        .map((video) => video.video_name);
+
+      const { data: storageFiles, error: storageError } = await supabase.storage
+        .from("videos")
+        .list("");
+
+      if (storageError)
+        throw new Error(`Storage error: ${storageError.message}`);
+
+      const filteredVideos = storageFiles.filter((file) =>
+        validVideoNames.includes(file.name)
+      );
+
+      setVideos(filteredVideos);
+    } catch (error) {
+      console.error("Error in getVideos:", error);
+      setVideos([]);
     }
-
-    if (!userInfo?.content_interest) {
-      console.error("No content interest found for user");
-      return;
-    }
-
-    // Then, get videos matching the user's content interest
-    const { data: dbVideos, error: dbError } = await supabase
-      .from("videos")
-      .select("*")
-      .eq("category", userInfo.content_interest);
-
-    if (dbError) {
-      console.error("Database error:", dbError);
-      alert("Error fetching videos from database");
-      return;
-    }
-
-    const validVideoNames = dbVideos
-      .filter((video) => video.video_name && video.video_name.trim() !== "")
-      .map((video) => video.video_name);
-
-    const { data: storageFiles, error: storageError } = await supabase.storage
-      .from("videos")
-      .list("");
-
-    if (storageError) {
-      console.error("Storage error:", storageError);
-      alert("Error grabbing files from storage");
-      return;
-    }
-
-    // // Add detailed comparison logging
-    // storageFiles.forEach((file) => {
-    //   console.log(`Checking file: ${file.name}`);
-    //   console.log(
-    //     `Database has this name?: ${validVideoNames.includes(file.name)}`
-    //   );
-    // });
-
-    const filteredVideos = storageFiles.filter((file) =>
-      validVideoNames.includes(file.name)
-    );
-
-    // console.log("Final filtered videos:", filteredVideos);
-    setVideos(filteredVideos);
-  }
+  }, [user?.email]); // Only depend on user email
 
   useEffect(() => {
     getVideos();
-  }, [user, getVideos]); // Updated useEffect dependency
+  }, [getVideos]); // Depend on getVideos function
 
   // Compute slides data: for each video, push a video slide and, if applicable, a quiz slide.
   const slidesData: SlideData[] = useMemo(() => {
