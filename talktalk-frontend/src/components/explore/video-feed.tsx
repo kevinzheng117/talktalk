@@ -9,6 +9,7 @@ import { useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { FileObject } from "@supabase/storage-js";
 import { supabase } from "@/lib/supabaseClient";
+import useUser from "@/hooks/useUser";
 
 const hideScrollbarStyles = `
   .scrollbar-none::-webkit-scrollbar {
@@ -26,6 +27,7 @@ interface SlideData {
 }
 
 export function VideoFeed() {
+  const { user } = useUser();
   const [videos, setVideos] = React.useState<FileObject[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [cycleCompleted, setCycleCompleted] = React.useState(false);
@@ -33,10 +35,33 @@ export function VideoFeed() {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   async function getVideos() {
-    // Select all fields to see what we're getting
+    if (!user?.email) {
+      console.error("No user email found");
+      return;
+    }
+
+    // First, get the user's content interest
+    const { data: userInfo, error: userError } = await supabase
+      .from("user_info")
+      .select("content_interest")
+      .eq("email", user.email)
+      .single();
+
+    if (userError) {
+      console.error("Error fetching user info:", userError);
+      return;
+    }
+
+    if (!userInfo?.content_interest) {
+      console.error("No content interest found for user");
+      return;
+    }
+
+    // Then, get videos matching the user's content interest
     const { data: dbVideos, error: dbError } = await supabase
       .from("videos")
-      .select("*");
+      .select("*")
+      .eq("category", userInfo.content_interest);
 
     if (dbError) {
       console.error("Database error:", dbError);
@@ -44,10 +69,9 @@ export function VideoFeed() {
       return;
     }
 
-    // Log the complete database records
+    // Rest of your existing code...
     console.log("Complete database records:", dbVideos);
 
-    // Filter out any entries with empty video names
     const validVideoNames = dbVideos
       .filter((video) => video.video_name && video.video_name.trim() !== "")
       .map((video) => video.video_name);
