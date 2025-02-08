@@ -2,12 +2,13 @@ import { QuizQuestion } from "@/types/quiz-data";
 
 export const languagesToLearn = [
   { label: "Spanish", value: "es" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Italian", value: "it" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Mandarin Chinese", value: "zh" },
+  { label: "English", value: "eg" },
+  // { label: "French", value: "fr" },
+  // { label: "German", value: "de" },
+  // { label: "Italian", value: "it" },
+  // { label: "Japanese", value: "ja" },
+  // { label: "Korean", value: "ko" },
+  // { label: "Mandarin Chinese", value: "zh" },
 ] as const;
 
 export const proficiencyLevels = [

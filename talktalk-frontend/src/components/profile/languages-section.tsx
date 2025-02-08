@@ -24,11 +24,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { languagesToLearn, proficiencyLevels } from "@/lib/constants";
-import { Key } from "react";
 
 export function LanguagesSection() {
   const { watch } = useFormContext();
-  const targetLanguages = watch("targetLanguages");
+  const targetLanguage = watch("targetLanguage");
 
   return (
     <Card>
@@ -43,15 +42,12 @@ export function LanguagesSection() {
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
-          name="targetLanguages"
+          name="targetLanguage"
           render={({ field }) => (
             <FormItem>
               <Select
                 onValueChange={(value) => {
-                  const current = field.value || [];
-                  if (!current.includes(value)) {
-                    field.onChange([...current, value]);
-                  }
+                  field.onChange(value);
                 }}
               >
                 <FormControl>
@@ -64,7 +60,7 @@ export function LanguagesSection() {
                     <SelectItem
                       key={language.value}
                       value={language.value}
-                      disabled={targetLanguages?.includes(language.value)}
+                      disabled={targetLanguage === language.value}
                     >
                       {language.label}
                     </SelectItem>
@@ -72,37 +68,31 @@ export function LanguagesSection() {
                 </SelectContent>
               </Select>
               {/* <div className="flex flex-wrap gap-2 pt-2">
-                {targetLanguages?.map((lang: Key | null | undefined) => (
+                {targetLanguage && (
                   <Badge
-                    key={lang}
-                    variant="secondary"
+                    variant="darkPurple"
                     className="cursor-pointer"
                     onClick={() => {
-                      field.onChange(
-                        targetLanguages.filter(
-                          (l: Key | null | undefined) => l !== lang
-                        )
-                      );
+                      field.onChange(null);
                     }}
                   >
-                    {languagesToLearn.find((l) => l.value === lang)?.label}
+                    {languagesToLearn.find((l) => l.value === targetLanguage)?.label}
                     <span className="ml-1">×</span>
                   </Badge>
-                ))}
+                )}
               </div> */}
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {targetLanguages?.map((lang: Key | null | undefined) => (
+        {targetLanguage && (
           <FormField
-            key={lang}
-            name={`proficiencyLevels.${lang}`}
+            name={`proficiencyLevels.${targetLanguage}`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  {languagesToLearn.find((l) => l.value === lang)?.label} Level
+                  {languagesToLearn.find((l) => l.value === targetLanguage)?.label} Level
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
@@ -125,7 +115,7 @@ export function LanguagesSection() {
               </FormItem>
             )}
           />
-        ))}
+        )}
       </CardContent>
     </Card>
   );
