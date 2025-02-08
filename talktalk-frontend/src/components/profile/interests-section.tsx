@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { contentCategories } from "@/lib/constants";
-import { Key } from "react";
 
 export function InterestsSection() {
   return (
@@ -33,7 +32,7 @@ export function InterestsSection() {
           Content Interests
         </CardTitle>
         <CardDescription>
-          Select a category of content you&apos;re interested in
+          Select one category of content you&apos;re interested in
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,6 +44,7 @@ export function InterestsSection() {
                 onValueChange={(value) => {
                   field.onChange(value);
                 }}
+                defaultValue={field.value} // Set the default value
               >
                 <FormControl>
                   <SelectTrigger>
@@ -65,16 +65,16 @@ export function InterestsSection() {
               </Select>
               {/* <div className="flex flex-wrap gap-2 pt-2">
                 {field.value && (
-                    <Badge
-                      variant="darkPurple"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        field.onChange(null);
-                      }}
-                    >
-                      {contentCategories.find((c) => c.value === field.value)?.label}
-                      <span className="ml-1">×</span>
-                    </Badge>
+                  <Badge
+                    variant="darkPurple"
+                    className="cursor-pointer"
+                    onClick={() => {
+                      field.onChange(null);
+                    }}
+                  >
+                    {contentCategories.find((c) => c.value === field.value)?.label}
+                    <span className="ml-1">×</span>
+                  </Badge>
                 )}
               </div> */}
               <FormMessage />

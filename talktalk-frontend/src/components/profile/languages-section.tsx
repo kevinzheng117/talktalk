@@ -49,6 +49,7 @@ export function LanguagesSection() {
                 onValueChange={(value) => {
                   field.onChange(value);
                 }}
+                defaultValue={field.value} // Set the default value
               >
                 <FormControl>
                   <SelectTrigger>
@@ -96,7 +97,7 @@ export function LanguagesSection() {
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value} // Set the default value
                 >
                   <FormControl>
                     <SelectTrigger>
