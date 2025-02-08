@@ -20,7 +20,10 @@ export default function Navbar() {
           >
             Explore
           </Link>
-          <Link href="#" className="transition-colors hover:text-primary">
+          <Link
+            href="/profile"
+            className="transition-colors hover:text-primary"
+          >
             Learn
           </Link>
           <Link href="#" className="transition-colors hover:text-primary">
