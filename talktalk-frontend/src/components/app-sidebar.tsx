@@ -24,8 +24,8 @@ const items = [
     icon: UserRoundPen,
   },
   {
-    title: "Progress",
-    url: "#",
+    title: "Upload",
+    url: "/upload",
     icon: Loader,
   },
 ];
