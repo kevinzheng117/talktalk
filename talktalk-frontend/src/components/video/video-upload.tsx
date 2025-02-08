@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { UploadForm } from "./upload-form";
 import { UploadStatus } from "./upload-status";
-import { VideoDetails } from "./video-details";
-import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import { FileObject } from "@supabase/storage-js";
 import { supabase } from "@/lib/supabaseClient";
@@ -25,22 +23,6 @@ export function VideoUpload() {
     }
   }
 
-  async function uploadFile(e: { target: { files: any[] } }) {
-    const videoFile = e.target.files[0];
-    console.log("Upload!");
-
-    const { error } = await supabase.storage
-      .from("videos")
-      .upload(uuidv4() + ".mp4", videoFile); // uuidv4() => ASDFASDFASDASFASDF.mp4
-
-    if (error) {
-      console.log(error);
-      alert("Error uploading file to Supabase");
-    }
-
-    getVideos();
-  }
-
   useEffect(() => {
     getVideos();
   }, []);
@@ -58,48 +40,67 @@ export function VideoUpload() {
       | ReadableStream<Uint8Array<ArrayBufferLike>>
       | URLSearchParams
   ) {
-    setIsUploading(true);
-    setProgress(0);
-    setShowDetails(false);
+    try {
+      setIsUploading(true);
+      setProgress(0);
+      setShowDetails(false);
 
-    // Simulated progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          setShowDetails(true);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 500);
+      // Generate unique filename
+      const generatedFileName = uuidv4() + ".mp4";
+      console.log("Generated filename:", generatedFileName);
 
-    const { error } = await supabase.storage
-      .from("videos")
-      .upload(uuidv4() + ".mp4", file);
-    if (error) {
-      console.log(error);
-      alert("Error uploading file to Supabase");
+      // Simulated progress
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      // Upload to storage
+      const { error: storageError } = await supabase.storage
+        .from("videos")
+        .upload(generatedFileName, file);
+
+      if (storageError) {
+        throw new Error(`Storage error: ${storageError.message}`);
+      }
+
+      // Add record to videos table
+      const { error: dbError } = await supabase.from("videos").insert([
+        {
+          video_name: generatedFileName,
+          category: "travel",
+        },
+      ]);
+
+      if (dbError) {
+        // Clean up the uploaded file if database insert fails
+        await supabase.storage.from("videos").remove([generatedFileName]);
+        throw new Error(`Database error: ${dbError.message}`);
+      }
+
+      await getVideos();
+      setIsUploading(false);
+      setShowDetails(true);
+      clearInterval(interval);
+    } catch (error) {
+      console.error("Upload process failed:", error);
+      alert(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+      setIsUploading(false);
     }
-    getVideos();
   }
-
   return (
     <div className="mt-8 grid gap-6">
       <div className="p-6 border rounded-md">
         <UploadForm onUpload={handleUpload} disabled={isUploading} />
         {isUploading && <UploadStatus progress={progress} />}
       </div>
-      {/* <div className="p-6 border rounded-md">
-        {showDetails ? (
-          <VideoDetails />
-        ) : (
-          <div className="h-full flex items-center justify-center text-muted-foreground">
-            <p>Video details will appear here after upload</p>
-          </div>
-        )}
-      </div> */}
     </div>
   );
 }

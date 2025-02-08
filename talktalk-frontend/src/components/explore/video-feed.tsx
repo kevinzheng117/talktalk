@@ -69,14 +69,9 @@ export function VideoFeed() {
       return;
     }
 
-    // Rest of your existing code...
-    console.log("Complete database records:", dbVideos);
-
     const validVideoNames = dbVideos
       .filter((video) => video.video_name && video.video_name.trim() !== "")
       .map((video) => video.video_name);
-
-    console.log("Valid video names after filtering:", validVideoNames);
 
     const { data: storageFiles, error: storageError } = await supabase.storage
       .from("videos")
@@ -88,19 +83,19 @@ export function VideoFeed() {
       return;
     }
 
-    // Add detailed comparison logging
-    storageFiles.forEach((file) => {
-      console.log(`Checking file: ${file.name}`);
-      console.log(
-        `Database has this name?: ${validVideoNames.includes(file.name)}`
-      );
-    });
+    // // Add detailed comparison logging
+    // storageFiles.forEach((file) => {
+    //   console.log(`Checking file: ${file.name}`);
+    //   console.log(
+    //     `Database has this name?: ${validVideoNames.includes(file.name)}`
+    //   );
+    // });
 
     const filteredVideos = storageFiles.filter((file) =>
       validVideoNames.includes(file.name)
     );
 
-    console.log("Final filtered videos:", filteredVideos);
+    // console.log("Final filtered videos:", filteredVideos);
     setVideos(filteredVideos);
   }
 
