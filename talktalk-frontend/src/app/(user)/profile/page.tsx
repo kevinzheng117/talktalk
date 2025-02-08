@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -15,7 +16,9 @@ import useUser from "@/hooks/useUser";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfilePage() {
-  const { user, isLoading, error } = useUser();
+  const { user, isLoading, error: userError } = useUser();
+  const [loading, setLoading] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -28,6 +31,35 @@ export default function ProfilePage() {
       interests: "",
     },
   });
+
+  useEffect(() => {
+    async function fetchUserInfo() {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("user_info")
+        .select("*")
+        .eq("email", user.email)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user info:", error);
+      } else if (data) {
+        form.reset({
+          displayName: data.name,
+          bio: data.bio || "",
+          targetLanguage: data.targetLanguage || "",
+          proficiencyLevels: data.proficiency || {},
+          learningIntensity: data.intensity || 3,
+          interests: data.content_interest || "",
+        });
+      }
+
+      setLoading(false);
+    }
+
+    fetchUserInfo();
+  }, [user, form]);
 
   async function onSubmit(values: ProfileFormData) {
     if (!user) return;
@@ -55,6 +87,8 @@ export default function ProfilePage() {
       );
     } else {
       console.log("Profile saved successfully!");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000); // Hide the success message after 3 seconds
     }
   }
 
@@ -86,12 +120,18 @@ export default function ProfilePage() {
           <InterestsSection />
 
           <div className="flex justify-end">
-            <Button type="submit" size="lg">
-              Save Profile
+            <Button type="submit" size="lg" disabled={loading}>
+              {loading ? "Loading..." : "Save Profile"}
             </Button>
           </div>
         </form>
       </Form>
+
+      {showSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-md shadow-lg">
+          Preferences successfully saved!
+        </div>
+      )}
     </div>
   );
 }
