@@ -97,7 +97,7 @@ export default function ProfilePage() {
       <div className="flex items-center gap-6">
         <Avatar className="h-24 w-24">
           <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback>UN</AvatarFallback>
+          <AvatarFallback>{user?.name ?? "UN"}</AvatarFallback>
         </Avatar>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">

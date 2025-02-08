@@ -50,6 +50,11 @@ export function UploadForm({ onUpload, disabled }: UploadFormProps) {
               <SelectItem value="food">Food</SelectItem>
               <SelectItem value="lifestyle">Lifestyle</SelectItem>
               <SelectItem value="education">Education</SelectItem>
+              <SelectItem value="sports">Sports</SelectItem>
+              <SelectItem value="music">Music</SelectItem>
+              <SelectItem value="news">News</SelectItem>
+              <SelectItem value="career">Career</SelectItem>
+              <SelectItem value="fashion">Fashion</SelectItem>
             </SelectContent>
           </Select>
         </div>
