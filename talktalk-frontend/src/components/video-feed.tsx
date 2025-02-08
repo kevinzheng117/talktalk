@@ -29,21 +29,21 @@ interface Video {
 const MOCK_VIDEOS: Video[] = [
   {
     id: "1",
-    url: "/placeholder.svg?height=1920&width=1080",
+    url: "/placeholder.mp4",
     caption: "Amazing sunset views! #sunset #views",
     likes: 1234,
     username: "@sunsetlover",
   },
   {
     id: "2",
-    url: "/placeholder.svg?height=1920&width=1080",
+    url: "/placeholder.mp4",
     caption: "Dance moves 🕺 #dance #viral",
     likes: 5678,
     username: "@dancepro",
   },
   {
     id: "3",
-    url: "/placeholder.svg?height=1920&width=1080",
+    url: "/placeholder.mp4",
     caption: "Cooking time! 🍳 #cooking #food",
     likes: 9012,
     username: "@cheflife",
@@ -86,26 +86,38 @@ export function VideoFeed() {
 
   // Handle video playback
   const handleVideoInView = React.useCallback((index: number) => {
-    videoRefs.current.forEach((video, i) => {
-      if (i === index) {
-        video?.play();
-      } else {
-        video?.pause();
-      }
-    });
+    // Pause all videos first
+    videoRefs.current.forEach((video) => video?.pause());
+    // Then play the target video and handle possible errors
+    const targetVideo = videoRefs.current[index];
+    if (targetVideo) {
+      targetVideo.play().catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error("Error playing video:", error);
+        }
+      });
+    }
     setCurrentIndex(index);
   }, []);
 
   // Navigate between videos
-  const navigateVideo = (direction: "up" | "down") => {
-    const newIndex =
-      direction === "up"
-        ? Math.max(0, currentIndex - 1)
-        : Math.min(videos.length - 1, currentIndex + 1);
+  const navigateVideo = React.useCallback(
+    (direction: "up" | "down") => {
+      const newIndex =
+        direction === "up"
+          ? Math.max(0, currentIndex - 1)
+          : Math.min(videos.length - 1, currentIndex + 1);
 
-    const videoElement = document.getElementById(`video-${newIndex}`);
-    videoElement?.scrollIntoView({ behavior: "smooth" });
-  };
+      const videoElement = document.getElementById(`video-${newIndex}`);
+      if (videoElement) {
+        videoElement.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+          handleVideoInView(newIndex);
+        }, 500);
+      }
+    },
+    [currentIndex, videos.length, handleVideoInView]
+  );
 
   return (
     <div className="relative h-[calc(100dvh-2rem)] w-full bg-black/95">
@@ -144,7 +156,6 @@ export function VideoFeed() {
                   ref={(el) => {
                     videoRefs.current[index] = el;
                   }}
-                  src={video.url}
                   className={cn(
                     "h-full w-full object-cover",
                     index === currentIndex ? "opacity-100" : "opacity-0"
@@ -157,7 +168,10 @@ export function VideoFeed() {
                       handleVideoInView(index);
                     }
                   }}
-                />
+                >
+                  <source src={video.url} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
 
                 {/* Video overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 text-white">
