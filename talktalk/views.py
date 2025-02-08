@@ -6,8 +6,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Video
 from .forms import VideoForm
+from django.contrib.auth.decorators import login_required
 
 
+# @login_required
 def video_upload(request):
     if request.method == 'POST':
         form = VideoForm(request.POST, request.FILES)

@@ -68,6 +68,7 @@ export function AuthForm({ type }: AuthFormProps) {
   function onSubmit(values: z.infer<typeof schema>) {
     console.log(values);
     // Handle form submission
+    window.location.href = 'http://127.0.0.1:8000/auth/login/google/';
   }
 
   return (

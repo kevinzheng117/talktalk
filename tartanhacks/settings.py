@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'talktalk',
     'rest_framework',
     'corsheaders',
+    'social_django',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -79,19 +80,22 @@ CORS_ALLOWED_ORIGINS = [
 ROOT_URLCONF = 'tartanhacks.urls'
 
 AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',  # Django default authentication
     'allauth.account.auth_backends.AuthenticationBackend',  # Allauth authentication
 )
 
 SITE_ID = 1  # Required for django-allauth
-
-LOGIN_REDIRECT_URL = '/'  # Redirect users after login
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'  # Redirect users after logout
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://127.0.0.1:8000/complete/google/'
+
 
 # SOCIALACCOUNT_PROVIDERS = {
 #     'google': {
