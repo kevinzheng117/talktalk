@@ -13,6 +13,7 @@ interface TikTokQuizProps {
 }
 
 export default function TikTokQuiz({ questions }: TikTokQuizProps) {
+  console.log("questions:", questions)
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
