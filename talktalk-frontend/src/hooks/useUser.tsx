@@ -9,7 +9,7 @@ const useUser = () => {
   return {
     user: session?.user,
     isLoading: status === "loading",
-    error: session?.error || null,
+    error: status === "unauthenticated" ? "Not authenticated" : null,
   };
 };
 
