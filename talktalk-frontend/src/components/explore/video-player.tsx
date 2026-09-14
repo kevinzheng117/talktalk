@@ -1,10 +1,10 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Volume2 } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import type { VideoPlayerProps } from "@/types/video";
-import { CDNURL } from "@/lib/constants";
+import { VideoOverlay } from "./video-overlay";
 
 export function VideoPlayer({
   video,
@@ -44,7 +44,38 @@ export function VideoPlayer({
 
       {hasError ? (
         <div className="absolute inset-0 flex items-center justify-center text-center text-sm text-white">
-          <p>Unable to load video</p>
+          <p>Unable to load this lesson</p>
+        </div>
+      ) : video.mediaType === "audio" ? (
+        <div
+          className={cn(
+            "flex h-full w-full flex-col items-center justify-center gap-6 bg-gradient-to-b from-purple-950 via-zinc-950 to-black px-8 text-center transition-opacity",
+            isActive ? "opacity-100" : "opacity-60"
+          )}
+        >
+          <div className="rounded-full bg-purple-500/15 p-6">
+            <Volume2 className="h-12 w-12 text-purple-300" />
+          </div>
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-300">
+              Audio micro-lesson
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">
+              {video.title}
+            </h2>
+          </div>
+          <audio
+            ref={videoRef}
+            className="w-full"
+            controls
+            preload="metadata"
+            onLoadedData={handleLoadedData}
+            onError={handleError}
+            onPlay={() => setIsLoading(false)}
+            onPause={() => setIsLoading(false)}
+          >
+            <source src={video.url} type="audio/wav" />
+          </audio>
         </div>
       ) : (
         <video
@@ -54,16 +85,25 @@ export function VideoPlayer({
             isActive ? "opacity-100" : "opacity-0"
           )}
           loop
+          autoPlay={isActive}
+          controls
+          muted
           playsInline
+          preload="metadata"
           onLoadedData={handleLoadedData}
           onError={handleError}
           // Add onPlay and onPause handlers to manage loading state
           onPlay={() => setIsLoading(false)}
           onPause={() => setIsLoading(false)}
         >
-          <source src={CDNURL + video.name} type="video/mp4" />
+          <source src={video.url} type="video/mp4" />
         </video>
       )}
+      <VideoOverlay
+        username={video.username}
+        caption={video.caption}
+        likes={video.likes}
+      />
     </div>
   );
 }

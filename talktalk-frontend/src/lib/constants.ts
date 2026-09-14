@@ -1,4 +1,5 @@
 import { QuizQuestion } from "@/types/quiz-data";
+import type { LearningVideo } from "@/types/video";
 
 export const languagesToLearn = [
   { label: "Spanish", value: "es" },
@@ -29,28 +30,96 @@ export const contentCategories = [
   { label: "Fashion", value: "fashion" },
 ] as const;
 
-export const MOCK_VIDEOS = [
+export const MOCK_VIDEOS: LearningVideo[] = [
   {
     id: "1",
-    url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    caption: "Amazing views! #views",
+    name: "sintel-trailer.mp4",
+    url: "/demo-videos/sintel-trailer.mp4",
+    mediaType: "video",
+    title: "Adventure vocabulary",
+    caption:
+      "Una aventura inolvidable — an unforgettable adventure. Listen, then repeat.",
     likes: 1234,
-    username: "@viewer",
+    username: "@talktalk_travel",
   },
   {
     id: "2",
-    url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    caption: "Dance moves 🕺 #dance",
+    name: "flower.mp4",
+    url: "/demo-videos/flower.mp4",
+    mediaType: "video",
+    title: "Making plans",
+    caption:
+      "¿Qué te gustaría hacer hoy? — What would you like to do today?",
     likes: 5678,
-    username: "@dancer",
+    username: "@talktalk_spanish",
   },
   {
     id: "3",
-    url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    caption: "Fun times! 🎉 #fun",
+    name: "big-buck-bunny.mp4",
+    url: "/demo-videos/big-buck-bunny.mp4",
+    mediaType: "video",
+    title: "Giving directions",
+    caption: "Sigue todo recto — continue straight ahead. Try saying it aloud.",
     likes: 9012,
-    username: "@funtime",
+    username: "@talktalk_spanish",
   },
+];
+
+export const demoQuizData: QuizQuestion[][] = [
+  [
+    {
+      question: "What does “una aventura inolvidable” mean?",
+      answers: [
+        "An unforgettable adventure",
+        "A quiet afternoon",
+        "A difficult question",
+        "An early flight",
+      ],
+      correct_answer: "An unforgettable adventure",
+    },
+    {
+      question: "Which phrase asks what someone would like to do?",
+      answers: [
+        "¿Qué te gustaría hacer?",
+        "¿Dónde está el hotel?",
+        "¿Cuánto cuesta?",
+        "¿Qué hora es?",
+      ],
+      correct_answer: "¿Qué te gustaría hacer?",
+    },
+    {
+      question: "What does “hoy” mean in English?",
+      answers: ["Today", "Tomorrow", "Yesterday", "Always"],
+      correct_answer: "Today",
+    },
+  ],
+  [
+    {
+      question: "What does “sigue todo recto” tell you to do?",
+      answers: ["Continue straight", "Turn left", "Stop here", "Go upstairs"],
+      correct_answer: "Continue straight",
+    },
+    {
+      question: "What should you compare in the word-choice lesson?",
+      answers: [
+        "Sentence structure",
+        "Video colors",
+        "Speaker clothing",
+        "Background music",
+      ],
+      correct_answer: "Sentence structure",
+    },
+    {
+      question: "Which habit best supports pronunciation practice?",
+      answers: [
+        "Listening and repeating",
+        "Skipping every word",
+        "Reading silently only",
+        "Avoiding feedback",
+      ],
+      correct_answer: "Listening and repeating",
+    },
+  ],
 ];
 
 export const quizData: QuizQuestion[][] = [
@@ -431,6 +500,3 @@ export const quizData: QuizQuestion[][] = [
     },
   ],
 ];
-
-export const CDNURL =
-  "https://lhayczdxenefkmxgdgif.supabase.co/storage/v1/object/public/videos/";

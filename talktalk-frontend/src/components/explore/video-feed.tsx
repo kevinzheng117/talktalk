@@ -4,12 +4,13 @@ import * as React from "react";
 import { NavigationControls } from "./navigation-controls";
 import { VideoPlayer } from "./video-player";
 import TikTokQuiz from "@/components/quiz/tiktok-quiz";
-import { quizData } from "@/lib/constants";
+import { MOCK_VIDEOS, demoQuizData, quizData } from "@/lib/constants";
 import { useEffect, useMemo } from "react";
-import type { FileObject } from "@supabase/storage-js";
 import { supabase } from "@/lib/supabaseClient";
 import useUser from "@/hooks/useUser";
 import { SpeechToText } from "@/components/azure-components/speech-v2";
+import type { QuizQuestion } from "@/types/quiz-data";
+import type { LearningVideo } from "@/types/video";
 
 const hideScrollbarStyles = `
   .scrollbar-none::-webkit-scrollbar {
@@ -23,64 +24,92 @@ const hideScrollbarStyles = `
 
 interface SlideData {
   type: "video" | "quiz" | "speech";
-  video?: FileObject;
+  video?: LearningVideo;
+  questions?: QuizQuestion[];
 }
 
 export function VideoFeed() {
   const { user } = useUser();
-  const [videos, setVideos] = React.useState<FileObject[]>([]);
+  const [videos, setVideos] = React.useState<LearningVideo[]>(MOCK_VIDEOS);
+  const [isUsingDemoData, setIsUsingDemoData] = React.useState(true);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [cycleCompleted, setCycleCompleted] = React.useState(false);
-  const videoRefs = React.useRef(new Map<string, HTMLVideoElement>());
+  const videoRefs = React.useRef(new Map<string, HTMLMediaElement>());
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   const getVideos = React.useCallback(async () => {
-    if (!user?.email) {
-      console.log("User not logged in yet");
+    if (!supabase) {
       return;
     }
 
+    const client = supabase;
+
     try {
-      // First, get the user's content interest
-      const { data: userInfo, error: userError } = await supabase
-        .from("user_info")
-        .select("content_interest")
-        .eq("email", user.email)
-        .single();
+      let preferredCategory: string | undefined;
 
-      if (userError) throw new Error(`User info error: ${userError.message}`);
-      if (!userInfo?.content_interest)
-        throw new Error("No content interest found");
+      if (user?.email) {
+        const { data: userInfo } = await client
+          .from("user_info")
+          .select("content_interest")
+          .eq("email", user.email)
+          .maybeSingle();
 
-      // Then, get videos matching the user's content interest
-      const { data: dbVideos, error: dbError } = await supabase
+        preferredCategory = userInfo?.content_interest;
+      }
+
+      // Video metadata and public storage are intentionally readable by guests.
+      // A signed-in learner's category is used when the legacy profile row exists.
+      const { data: allRows, error: dbError } = await client
         .from("videos")
-        .select("*")
-        .eq("category", userInfo.content_interest);
+        .select("*");
 
-      if (dbError) throw new Error(`Database error: ${dbError.message}`);
+      const dbVideos = dbError
+        ? []
+        : (allRows ?? []).filter(
+            (row) => !preferredCategory || row.category === preferredCategory
+          );
 
-      const validVideoNames = dbVideos
-        .filter((video) => video.video_name && video.video_name.trim() !== "")
-        .map((video) => video.video_name);
-
-      const { data: storageFiles, error: storageError } = await supabase.storage
+      const { data: storageFiles } = await client.storage
         .from("videos")
-        .list("");
+        .list("", { limit: 100, sortBy: { column: "created_at", order: "asc" } });
 
-      if (storageError)
-        throw new Error(`Storage error: ${storageError.message}`);
-
-      const filteredVideos = storageFiles.filter((file) =>
-        validVideoNames.includes(file.name)
+      const rowsByName = new Map(
+        dbVideos
+          .filter((row) => row.video_name?.trim())
+          .map((row) => [row.video_name, row])
       );
+      const names = rowsByName.size
+        ? [...rowsByName.keys()]
+        : (storageFiles ?? [])
+            .map((file) => file.name)
+            .filter((name) => name.toLowerCase().endsWith(".mp4"));
 
-      setVideos(filteredVideos);
-    } catch (error) {
-      console.error("Error in getVideos:", error);
-      setVideos([]);
+      const databaseVideos = names.map((name, index) => {
+        const row = rowsByName.get(name);
+        const file = storageFiles?.find((item) => item.name === name);
+        const { data } = client.storage.from("videos").getPublicUrl(name);
+
+        return {
+          id: file?.id ?? row?.id?.toString() ?? name,
+          name,
+          url: data.publicUrl,
+          mediaType: "video",
+          title: row?.title ?? "TalkTalk lesson",
+          caption:
+            row?.caption ?? "Listen closely, then continue to the practice card.",
+          likes: row?.likes ?? 1200 + index * 317,
+          username: row?.username ?? "@talktalk",
+        } satisfies LearningVideo;
+      });
+
+      if (databaseVideos.length > 0) {
+        setVideos(databaseVideos);
+        setIsUsingDemoData(false);
+      }
+    } catch {
+      // Keep the bundled lessons already in state when Supabase is unavailable.
     }
-  }, [user?.email]); // Only depend on user email
+  }, [user?.email]);
 
   useEffect(() => {
     getVideos();
@@ -89,20 +118,22 @@ export function VideoFeed() {
   // Compute slides data: for each video, push a video slide and, if applicable, a quiz slide.
   const slidesData: SlideData[] = useMemo(() => {
     const slides: SlideData[] = [];
+    const quizSets = isUsingDemoData ? demoQuizData : quizData;
+
     videos.forEach((video, index) => {
       slides.push({ type: "video", video });
       // Add quiz after every 2nd video
       if ((index + 1) % 2 === 0) {
-        slides.push({ type: "quiz" });
+        const quizIndex = Math.floor(index / 2) % quizSets.length;
+        slides.push({ type: "quiz", questions: quizSets[quizIndex] });
       }
-      // Add speech practice after every 5th video
-      // Make sure it doesn't overlap with quiz
-      if ((index + 1) % 5 === 0 && (index + 1) % 2 !== 0) {
+      // Keep pronunciation practice in the short three-video demo cycle.
+      if ((index + 1) % 3 === 0 && (index + 1) % 2 !== 0) {
         slides.push({ type: "speech" });
       }
     });
     return slides;
-  }, [videos]);
+  }, [isUsingDemoData, videos]);
 
   // For video slides, play the active video.
   const handleVideoInView = React.useCallback(
@@ -134,11 +165,17 @@ export function VideoFeed() {
   const handleNavigation = React.useCallback(
     (direction: "up" | "down") => {
       const totalSlides = slidesData.length;
-      if (direction === "down" && currentIndex === totalSlides - 1) {
+      const container = scrollContainerRef.current;
+      const visibleIndex = container
+        ? Math.round(container.scrollTop / container.clientHeight)
+        : currentIndex;
+
+      if (direction === "down" && visibleIndex === totalSlides - 1) {
         setCycleCompleted(true);
         return;
       }
-      let newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      let newIndex =
+        direction === "up" ? visibleIndex - 1 : visibleIndex + 1;
       if (newIndex >= totalSlides) {
         newIndex = 0;
       } else if (newIndex < 0) {
@@ -146,9 +183,9 @@ export function VideoFeed() {
       }
 
       // Scroll container scrolls to the new slide.
-      if (scrollContainerRef.current) {
-        const containerHeight = scrollContainerRef.current.clientHeight;
-        scrollContainerRef.current.scrollTo({
+      if (container) {
+        const containerHeight = container.clientHeight;
+        container.scrollTo({
           top: containerHeight * newIndex,
           behavior: "smooth",
         });
@@ -177,7 +214,7 @@ export function VideoFeed() {
         rootMargin: "0px",
       }
     );
-    const elements = document.querySelectorAll(
+    const elements = scrollContainerRef.current.querySelectorAll(
       ".video-container, .quiz-container, .speech-container"
     );
     elements.forEach((el) => observer.observe(el));
@@ -226,8 +263,6 @@ export function VideoFeed() {
       }
       
       if (slide.type === "quiz") {
-        const q_idx = i >= 1 ? i - 1 : 0;
-        console.log("about to pass", quizData[q_idx], "at idx", q_idx)
         return (
           <div
             key={`quiz-${i}`}
@@ -235,7 +270,7 @@ export function VideoFeed() {
             className="quiz-container relative h-full w-full snap-start snap-always"
           >
             <div className="flex h-full items-center justify-center px-4">
-              <TikTokQuiz questions={quizData[q_idx]} />
+              <TikTokQuiz questions={slide.questions ?? quizData[0]} />
             </div>
           </div>
         );
@@ -248,7 +283,9 @@ export function VideoFeed() {
           className="speech-container relative h-full w-full snap-start snap-always"
         >
           <div className="flex h-full items-center justify-center px-4">
-            <SpeechToText referenceText={"Europa por treinta y nueve mil."} />
+            <SpeechToText
+              referenceText={"Sigue todo recto hasta el parque."}
+            />
           </div>
         </div>
       );

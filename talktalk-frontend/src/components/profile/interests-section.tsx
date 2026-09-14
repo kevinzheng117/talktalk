@@ -44,7 +44,7 @@ export function InterestsSection() {
                 onValueChange={(value) => {
                   field.onChange(value);
                 }}
-                defaultValue={field.value} // Set the default value
+                value={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -56,7 +56,6 @@ export function InterestsSection() {
                     <SelectItem
                       key={category.value}
                       value={category.value}
-                      disabled={field.value === category.value}
                     >
                       {category.label}
                     </SelectItem>

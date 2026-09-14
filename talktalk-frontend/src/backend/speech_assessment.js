@@ -14,7 +14,6 @@ const { SpeechConfig, AudioConfig, SpeechRecognizer, PronunciationAssessmentConf
 
 const speechKey = process.env.SPEECH_KEY;
 const serviceRegion = "eastus";
-console.log("KEY", speechKey)
 
 // File paths for audio
 const welcomeFileName = "../sample_audio/sample_welcome.wav";

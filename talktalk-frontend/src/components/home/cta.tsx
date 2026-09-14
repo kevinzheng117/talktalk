@@ -1,5 +1,6 @@
 // app/components/cta.tsx
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // Update CTA content
 export default function CTA() {
@@ -14,10 +15,11 @@ export default function CTA() {
           speaking with confidence today.
         </p>
         <Button
+          asChild
           size="lg"
           className="mt-4 bg-gradient-to-r from-primary to-accent hover:opacity-90"
         >
-          Download TalkTalk
+          <Link href="/explore">Start Learning Free</Link>
         </Button>
       </div>
     </section>

@@ -49,7 +49,7 @@ export function LanguagesSection() {
                 onValueChange={(value) => {
                   field.onChange(value);
                 }}
-                defaultValue={field.value} // Set the default value
+                value={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -61,7 +61,6 @@ export function LanguagesSection() {
                     <SelectItem
                       key={language.value}
                       value={language.value}
-                      disabled={targetLanguage === language.value}
                     >
                       {language.label}
                     </SelectItem>
@@ -97,7 +96,7 @@ export function LanguagesSection() {
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value} // Set the default value
+                  value={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>

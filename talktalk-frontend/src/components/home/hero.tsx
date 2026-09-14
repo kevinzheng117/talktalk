@@ -1,5 +1,6 @@
 // app/components/hero.tsx
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 // Update the hero section content
@@ -20,14 +21,17 @@ export default function Hero() {
       </div>
       <div className="flex gap-4">
         <Button
+          asChild
           size="lg"
           className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
         >
-          Start Learning
-          <ArrowRight className="ml-2 h-4 w-4" />
+          <Link href="/explore">
+            Start Learning
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </Button>
-        <Button variant="outline" size="lg">
-          Browse Languages
+        <Button asChild variant="outline" size="lg">
+          <Link href="/profile">Choose a Language</Link>
         </Button>
       </div>
     </section>

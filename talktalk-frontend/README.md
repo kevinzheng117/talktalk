@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalkTalk frontend
 
-## Getting Started
+TalkTalk is a short-form language-learning demo built with Next.js 15, React
+19, TypeScript, Tailwind CSS, Auth.js, Supabase, and Azure Speech.
 
-First, run the development server:
+The core demo is deliberately resilient: three bundled MP4 lessons and seeded
+quizzes keep `/explore`, `/profile`, and `/progress` usable without external
+services. When configured, the app loads public video metadata and media from
+the Supabase `videos` table and `videos` Storage bucket. Google sign-in and
+Azure pronunciation assessment remain optional.
+
+## Getting started
+
+Install dependencies and run the development server from this directory:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local`. Every integration is optional for the
+seeded demo, but each configured integration needs its complete variable set.
 
-## Learn More
+- `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`: Google sign-in.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`: public video
+  metadata and the `videos` Storage bucket. Guests can browse the feed; a
+  signed-in learner's `user_info.content_interest` is used when available.
+- `SPEECH_KEY`, `SPEECH_REGION`: Azure Speech pronunciation assessment.
 
-To learn more about Next.js, take a look at the following resources:
+Do not prefix `SPEECH_KEY` with `NEXT_PUBLIC_`; the subscription key stays on
+the server and the browser receives only a short-lived Azure token.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+Then verify `/`, `/explore`, `/profile`, `/progress`, and
+`/api/speech-token`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Bundled demo media
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The resilient guest feed uses local copies of open sample media so playback
+does not depend on a third-party CDN at runtime:
+
+- the Sintel trailer from the W3C media test collection;
+- MDN's CC0 flower clip;
+- a short Big Buck Bunny browser-test clip from `cseitz/sample-files`.
+
+## Vercel deployment
+
+Use `talktalk-frontend` as the Vercel Root Directory. The framework preset,
+install command, build command (`npm run build`), and output settings can use
+Vercel's Next.js defaults. Add environment variables for Production and
+Preview as needed, then redeploy.

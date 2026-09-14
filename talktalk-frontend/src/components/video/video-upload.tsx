@@ -5,21 +5,29 @@ import { UploadForm } from "./upload-form";
 import { UploadStatus } from "./upload-status";
 import { v4 as uuidv4 } from "uuid";
 import { FileObject } from "@supabase/storage-js";
-import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 
 export function VideoUpload() {
   const [videos, setVideos] = useState<FileObject[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [isSupabaseAvailable, setIsSupabaseAvailable] = useState(
+    isSupabaseConfigured
+  );
 
   async function getVideos() {
-    const { data, error } = await supabase.storage.from("videos").list("");
+    if (!supabase) {
+      setIsSupabaseAvailable(false);
+      return;
+    }
+
+    const { data } = await supabase.storage.from("videos").list("");
     if (data !== null) {
       setVideos(data);
+      setIsSupabaseAvailable(true);
     } else {
-      console.log(error);
-      alert("Error grabbing files from Supabase");
+      setIsSupabaseAvailable(false);
     }
   }
 
@@ -42,6 +50,11 @@ export function VideoUpload() {
     category: string
   ) {
     try {
+      if (!supabase || !isSupabaseAvailable) {
+        throw new Error("Video uploads require Supabase configuration.");
+      }
+
+      const client = supabase;
       setIsUploading(true);
       setProgress(0);
       setShowDetails(false);
@@ -62,7 +75,7 @@ export function VideoUpload() {
       }, 500);
 
       // Upload to storage
-      const { error: storageError } = await supabase.storage
+      const { error: storageError } = await client.storage
         .from("videos")
         .upload(generatedFileName, file);
 
@@ -71,7 +84,7 @@ export function VideoUpload() {
       }
 
       // Add record to videos table
-      const { error: dbError } = await supabase.from("videos").insert([
+      const { error: dbError } = await client.from("videos").insert([
         {
           video_name: generatedFileName,
           category: category,
@@ -80,7 +93,7 @@ export function VideoUpload() {
 
       if (dbError) {
         // Clean up the uploaded file if database insert fails
-        await supabase.storage.from("videos").remove([generatedFileName]);
+        await client.storage.from("videos").remove([generatedFileName]);
         throw new Error(`Database error: ${dbError.message}`);
       }
 
@@ -99,7 +112,16 @@ export function VideoUpload() {
   return (
     <div className="mt-8 grid gap-6">
       <div className="p-6 border rounded-md">
-        <UploadForm onUpload={handleUpload} disabled={isUploading} />
+        {!isSupabaseAvailable && (
+          <p className="mb-4 text-sm text-amber-300">
+            Uploads are disabled in demo mode. Check the Supabase environment
+            variables and service availability to enable them.
+          </p>
+        )}
+        <UploadForm
+          onUpload={handleUpload}
+          disabled={isUploading || !isSupabaseAvailable}
+        />
         {isUploading && <UploadStatus progress={progress} />}
       </div>
     </div>

@@ -1,10 +1,19 @@
-import { FileObject } from "@supabase/storage-js";
+export interface LearningVideo {
+  id: string;
+  name: string;
+  url: string;
+  mediaType: "video" | "audio";
+  title: string;
+  caption: string;
+  likes: number;
+  username: string;
+}
 
 export interface VideoPlayerProps {
-  video: FileObject;
+  video: LearningVideo;
   isActive: boolean;
   onLoadedData: () => void;
-  videoRef: (el: HTMLVideoElement | null) => void;
+  videoRef: (el: HTMLMediaElement | null) => void;
 }
 
 export interface VideoOverlayProps {
