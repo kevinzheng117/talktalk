@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Telescope,
   UserRoundIcon as UserRoundPen,
